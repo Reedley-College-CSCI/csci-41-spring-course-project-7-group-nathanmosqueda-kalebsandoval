@@ -1,9 +1,13 @@
+
 #include "MovieList.h"
+#include "InputValidation.h"
 #include <iostream>
 #include <fstream>
-#include <windows.h>
+#include <chrono>
 
 using namespace std;
+using namespace std::chrono;
+
 
 MovieList::MovieList() {
     // Initialize to null ptr
@@ -14,7 +18,7 @@ MovieList::MovieList() {
 }
 
 MovieList::~MovieList() {
-   // sets all buckets to empty
+    // sets all buckets to empty
     for (int i = 0; i < TABLE_SIZE; i++) {
         HashNode* current = hashTable[i];
         while (current != nullptr) {
@@ -27,7 +31,8 @@ MovieList::~MovieList() {
 }
 
 void MovieList::runMovieSystem() {
-    DWORD start = GetTickCount();
+    // Start the clock
+    auto start = high_resolution_clock::now();
     loadDataFromFile();
 
     int decision = 0;
@@ -45,7 +50,6 @@ void MovieList::runMovieSystem() {
         cin >> decision;
         cin.ignore();
 
-        
         switch (decision) {
         case 1:
             addMovie();
@@ -73,62 +77,43 @@ void MovieList::runMovieSystem() {
         }
     } while (decision != 7); // Continue the loop until the user chooses to exit
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Elapsed time in runMovieSystem(): " << elapsedTime << " ms" << endl;
+    // End the clock
+    auto end = high_resolution_clock::now();
+
+    // Calculate the duration
+    auto duration = duration_cast<milliseconds>(end - start).count();
+
+    cout << "Elapsed time in runMovieSystem(): " << duration << " ms" << endl;
 }
 
-void MovieList::addMovie() {
-    DWORD start = GetTickCount();
+// Modify other functions similarly with chrono
 
-    string name, review;
-    int rating;
-    double releaseYear;
+
+void MovieList::addMovie() {
+
+
+    string name = "", review = "";
+    int rating = 0;
+    double releaseYear = 0.0;
 
     cout << "Enter name of movie: ";
     getline(cin, name);
 
-    do {
-        cout << "Enter rating (1 - 5): ";
-        cin >> rating;
-        cin.ignore();
-
-        if (rating < 1 || rating > 5) {
-            cout << "Invalid rating. Please enter a rating between 1 and 5." << endl;
-        }
-    } while (rating < 1 || rating > 5);
-
-    do {
-        cout << "Enter release year: ";
-        cin >> releaseYear;
-        cin.ignore();
-
-        if (releaseYear < 1900 || releaseYear > 2025) {
-            cout << "Invalid release year. Please enter a year between 1900 and 2025." << endl;
-        }
-    } while (releaseYear < 1900 || releaseYear > 2025);
-
-    do {
-        cout << "Enter review (up to " << MAX_REVIEW_LENGTH << " characters): ";
-        getline(cin, review);
-
-        if (review.length() > MAX_REVIEW_LENGTH) {
-            cout << "Review is too long. Please enter a review with a maximum of " << MAX_REVIEW_LENGTH << " characters." << endl;
-        }
-    } while (review.length() > MAX_REVIEW_LENGTH);
+    rating = getValidRating();
+    releaseYear = getValidReleaseYear();
+    review = getValidReview();
 
     Movie* newMovie = new Movie(name, rating, releaseYear, review);
     insertIntoHashTable(newMovie); // Insert the new movie into the hash table
     saveDataToFile(); // Save updated data to file
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time taken to add movie: " << elapsedTime << " ms" << endl;
+
     cout << "Movie Added successfully." << endl;
 }
 
+
 void MovieList::removeMovie() {
-    DWORD start = GetTickCount();
+
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -141,14 +126,12 @@ void MovieList::removeMovie() {
     removeFromHashTable(searchName); // Remove the movie from the hash table
     saveDataToFile(); // Save updated data to file
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time to remove movie: " << elapsedTime << " ms" << endl;
+
     cout << "Movie removed successfully." << endl;
 }
 
 void MovieList::modifyMovie() {
-    DWORD start = GetTickCount();
+
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -182,20 +165,15 @@ void MovieList::modifyMovie() {
         break;
     }
     case 2: {
-        cout << "Enter the new rating: ";
-        cin >> movieToModify->rating;
-        cin.ignore();
+        movieToModify->rating = getValidRating();
         break;
     }
     case 3: {
-        cout << "Enter the new release year: ";
-        cin >> movieToModify->releaseYear;
-        cin.ignore();
+        movieToModify->releaseYear = getValidReleaseYear();
         break;
     }
     case 4: {
-        cout << "Enter the new review: ";
-        getline(cin, movieToModify->review);
+        movieToModify->review = getValidReview();
         break;
     }
     default:
@@ -204,14 +182,11 @@ void MovieList::modifyMovie() {
 
     saveDataToFile(); // Save updated data to file
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time taken to modify movie: " << elapsedTime << " ms" << endl;
+
     cout << "Movie modified successfully." << endl;
 }
-
 void MovieList::displayMovieList() {
-    DWORD start = GetTickCount();
+
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -230,13 +205,11 @@ void MovieList::displayMovieList() {
         }
     }
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time taken to display movie list: " << elapsedTime << " ms" << endl;
 }
 
+
 void MovieList::displayMoviesInRange() {
-    DWORD start = GetTickCount();
+
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -266,13 +239,11 @@ void MovieList::displayMoviesInRange() {
         }
     }
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time taken to display movies in range: " << elapsedTime << " ms" << endl;
+
 }
 
 void MovieList::searchMovie() {
-    DWORD start = GetTickCount();
+
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -282,7 +253,7 @@ void MovieList::searchMovie() {
     cout << "Enter the name of the movie you want to search for: ";
     getline(cin, searchName);
 
-    Movie* foundMovie = searchHashTable(searchName); 
+    Movie* foundMovie = searchHashTable(searchName);
     if (foundMovie != nullptr) {
         cout << "Movie found:" << endl;
         cout << "Name: " << foundMovie->name << endl;
@@ -294,9 +265,6 @@ void MovieList::searchMovie() {
         cout << "Movie not found." << endl;
     }
 
-    DWORD end = GetTickCount();
-    DWORD elapsedTime = end - start;
-    cout << "Time taken to search movie: " << elapsedTime << " ms" << endl;
 }
 
 void MovieList::saveDataToFile() {
