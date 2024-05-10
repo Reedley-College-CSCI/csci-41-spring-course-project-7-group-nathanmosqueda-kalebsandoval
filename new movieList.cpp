@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <chrono>
-
+#include <unordered_map>
 using namespace std;
 using namespace std::chrono;
 
@@ -45,7 +45,8 @@ void MovieList::runMovieSystem() {
         cout << "4. Display movie list" << endl;
         cout << "5. Display movies in a range of years" << endl;
         cout << "6. Search a movie" << endl;
-        cout << "7. Exit" << endl;
+        cout << "7. Reccommend me a genre" << endl;
+        cout << "8. Exit" << endl;
 
         cin >> decision;
         cin.ignore();
@@ -70,6 +71,9 @@ void MovieList::runMovieSystem() {
             searchMovie();
             break;
         case 7:
+            movieRec();
+            break;
+        case 8:
             cout << "Exiting the program." << endl;
             break;
         default:
@@ -92,7 +96,7 @@ void MovieList::runMovieSystem() {
 void MovieList::addMovie() {
 
 
-    string name = "", review = "";
+    string name = "", review = "", genre = "";
     int rating = 0;
     double releaseYear = 0.0;
 
@@ -102,8 +106,10 @@ void MovieList::addMovie() {
     rating = getValidRating();
     releaseYear = getValidReleaseYear();
     review = getValidReview();
+    cout << "Enter the genre of movie: ";
+    getline(cin, genre);
 
-    Movie* newMovie = new Movie(name, rating, releaseYear, review);
+    Movie* newMovie = new Movie(name, rating, releaseYear, review, genre);
     insertIntoHashTable(newMovie); // Insert the new movie into the hash table
     saveDataToFile(); // Save updated data to file
 
@@ -152,6 +158,7 @@ void MovieList::modifyMovie() {
     cout << "2. Rating" << endl;
     cout << "3. Release Year" << endl;
     cout << "4. Review" << endl;
+    cout << "5. Review" << endl;
 
     int choice;
     cout << "Enter your choice: ";
@@ -176,6 +183,11 @@ void MovieList::modifyMovie() {
         movieToModify->review = getValidReview();
         break;
     }
+    case 5: {
+    cout << "Enter the new genre: " << endl;
+    getline(cin, movieToModify->genre);
+    break;
+    }
     default:
         cout << "Invalid choice." << endl;
     }
@@ -186,7 +198,8 @@ void MovieList::modifyMovie() {
     cout << "Movie modified successfully." << endl;
 }
 void MovieList::displayMovieList() {
-
+    char displaychoice;
+    bool validChoice = false;
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -197,19 +210,27 @@ void MovieList::displayMovieList() {
         HashNode* current = hashTable[i];
         while (current != nullptr) {
             cout << "Name: " << current->data->name << endl;
-            cout << "Rating: " << current->data->rating << endl;
-            cout << "Release Year: " << current->data->releaseYear << endl;
-            cout << "Review: " << current->data->review << endl;
-            cout << endl;
             current = current->next;
         }
     }
-
+    cout << "Would you like to see the details of a specific movie?\n" << "<Y> <N>" << endl;
+    cin >> displaychoice;
+    if (displaychoice == 'Y' || displaychoice == 'y') {
+        cin.ignore();
+        searchMovie();
+        validChoice = true;
+    }
+    else if (displaychoice == 'N' || displaychoice == 'n') {
+        validChoice = true;
+    }
+    else {
+        cout << "input invalid, please enter <Y> or <N>";
+    }
 }
 
 
 void MovieList::displayMoviesInRange() {
-
+    char displaychoice;
     if (hashTableIsEmpty()) {
         cout << "Movie list is empty." << endl;
         return;
@@ -230,15 +251,20 @@ void MovieList::displayMoviesInRange() {
         while (current != nullptr) {
             if (current->data->releaseYear >= startYear && current->data->releaseYear <= endYear) {
                 cout << "Name: " << current->data->name << endl;
-                cout << "Rating: " << current->data->rating << endl;
-                cout << "Release Year: " << current->data->releaseYear << endl;
-                cout << "Review: " << current->data->review << endl;
-                cout << endl;
+              
             }
             current = current->next;
         }
     }
+    cout << "Would you like to see the details of a specific movie?\n" << "<Y> <N>" << endl;
+    cin >> displaychoice;
+    if (displaychoice == 'Y' || displaychoice == 'y') {
+        cin.ignore();
+        searchMovie();
+    }
+    else if (displaychoice == 'N' || displaychoice == 'n') {
 
+    }
 
 }
 
@@ -260,6 +286,7 @@ void MovieList::searchMovie() {
         cout << "Rating: " << foundMovie->rating << endl;
         cout << "Release Year: " << foundMovie->releaseYear << endl;
         cout << "Review: " << foundMovie->review << endl;
+        cout << "Genre: " << foundMovie->genre << endl;
     }
     else {
         cout << "Movie not found." << endl;
@@ -277,7 +304,7 @@ void MovieList::saveDataToFile() {
     for (int i = 0; i < TABLE_SIZE; i++) {
         HashNode* current = hashTable[i];
         while (current != nullptr) {
-            outFile << current->data->name << '|' << current->data->rating << '|' << current->data->releaseYear << '|' << current->data->review << endl;
+            outFile << current->data->name << '|' << current->data->rating << '|' << current->data->releaseYear << '|' << current->data->review << '|' << current->data->genre << endl;
             current = current->next;
         }
     }
@@ -298,7 +325,7 @@ void MovieList::loadDataFromFile() {
         hashTable[i] = nullptr;
     }
 
-    string name, review;
+    string name, review, genre;
     int rating;
     double releaseYear;
 
@@ -307,9 +334,10 @@ void MovieList::loadDataFromFile() {
         inputFile.ignore();
         inputFile >> releaseYear;
         inputFile.ignore();
-        getline(inputFile, review);
+        getline(inputFile, review, '|');
+        getline(inputFile, genre);
 
-        Movie* newMovie = new Movie(name, rating, releaseYear, review);
+        Movie* newMovie = new Movie(name, rating, releaseYear, review, genre);
         insertIntoHashTable(newMovie);
     }
 
@@ -389,5 +417,34 @@ bool MovieList::hashTableIsEmpty() {
         }
     }
     return true; // Hash table is empty
+}
+
+// Function to find the genre with the most movies rated 4 or higher
+    string MovieList::movieRec() {
+
+    unordered_map<string, int> genreCounts;
+
+    for (int i = 0; i < TABLE_SIZE; i++) {
+        HashNode* current = hashTable[i];
+        while (current != nullptr) {
+            if (current->data->rating >= 4) {
+                
+                genreCounts[current->data->genre]++;
+            }
+            current = current->next;
+        }
+    }
+
+    string genreWithMostHighRatedMovies;
+    int maxCount = 0;
+    for (const auto& entry : genreCounts) {
+        if (entry.second > maxCount) {
+            maxCount = entry.second;
+            genreWithMostHighRatedMovies = entry.first;
+        }
+    }
+    cout << "Based on the movies you have rated you should watch more of the " << genreWithMostHighRatedMovies << " " "genre" << endl;
+    cout << "You gave a total of " << maxCount << " " "movie(s) with this genre a 4 or a above" << endl;
+    return 0;
 }
 
