@@ -1,1 +1,3 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/tXG5FafZ)
+
+With this project we stuck with hash tables due to the efficency of if its storage and retrieval, with hash tables only having a constant-time average of O(1)for insertion deletion and retrieval operations it makes it a fast and efficent data structure. Because of this constant time average it'll scale very well. Even as the program begins to take in a large amount of movies the hash table's performance won't be significantly impacted, remaining efficent.
