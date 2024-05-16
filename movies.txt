@@ -1,2 +1,22 @@
-Wonka|2|2023|Musical aspect ruined it|Musical
 The Shawshank Redemption|5|1994|One of the greats|Drama
+Leave no trace|3|2018|A beautiful film|Thriller
+Toy Story 2|5|1999|Best childerens film ever made|Comedy
+76 days|4|2020|Very relateable|Documentary
+The tale of the princess kaguya|5|2013|beautifully retells a japanese folk story|Fantasy
+Singin in the rain|2|1952|not really my thing apparently|Musical
+The terminator|4|1984|while great the age has become noticable|Action
+Only yesterday|4|1991|A slow burn but a great one|Romance
+Lady bird|5|2017|an amazing coming of age story|Drama
+Wonka|2|2023|Not a single good song|Musical
+Mean girls|1|2024|Why|Musical
+Immaculate|4|2024|not bad not bad|Horror
+Dark Knight|5|2008|Masterpiece|Action
+Forrest Gump|5|1994|Made me cry|Comedy
+Life is beautiful|3|Just okay|War
+Spirited away|5|2001|Ghiblis magnum opus|Fantasy
+End Of Evangelion|5|1997|personal favorite|Sci-Fi
+Grave of the fireflies|4|1988|A little slow but great|Drama
+Alien|4|1979|Holds up very well|Action
+Resevoir dogs|4|1992|Very Fun|Thriller
+To Kill A Mockingbird|2|1962|A classic but boring|Mystery
+Die Hard|4|1988|Amazing action|Action
