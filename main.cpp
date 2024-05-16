@@ -1,55 +1,23 @@
-#pragma once
-#pragma once
-
-#include <string>
+#include "movielist.h"
+#include <fstream>
+#include<iostream>
 
 using namespace std;
 
-const int MAX_REVIEW_LENGTH = 30;
-const int TABLE_SIZE = 8; // Adjust the table size based on your requirements
+int main() {
+    ifstream inputFile;
+    inputFile.open("movies.txt");
 
-struct Movie {
-    string name;
-    int rating;
-    double releaseYear;
-    string review;
-    string genre;
-    Movie* next;
+    if (!inputFile.is_open())
+        cout << "File: movies.txt is not found" << endl;
 
-    Movie() : rating(0), releaseYear(0), next(nullptr) {}
 
-    Movie(string name, int rating, double releaseYear, string review, string genre)
-        : name(name), rating(rating), releaseYear(releaseYear), review(review), genre(genre), next(nullptr) {}
-};
+    MovieList movieListSystem;
 
-class MovieList {
-private:
-    struct HashNode {
-        Movie* data;
-        HashNode* next;
-    };
+    movieListSystem.runMovieSystem();
 
-    HashNode* hashTable[TABLE_SIZE]; // Hash array
 
-public:
-    MovieList();
-    ~MovieList();
+    inputFile.close();
 
-    void runMovieSystem();
-    void addMovie();
-    void removeMovie();
-    void modifyMovie();
-    void displayMovieList();
-    void displayMoviesInRange();
-    void searchMovie();
-    void saveDataToFile();
-    void loadDataFromFile();
-    string movieRec();
-
-private:
-    int hashFunction(const string& key);
-    void insertIntoHashTable(Movie* movie);
-    void removeFromHashTable(const string& key);
-    Movie* searchHashTable(const string& key);
-    bool hashTableIsEmpty();
-};
+    return 0;
+}
